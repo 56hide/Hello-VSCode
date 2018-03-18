@@ -2,7 +2,6 @@
 # b = a
 # a = 'ABC'
 # print(b)
-# n = 123
 # f = 456.789
 # s1 = 'Hello, world'
 # s2 = 'Hello, \'Adam\''
