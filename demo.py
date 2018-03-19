@@ -10,5 +10,5 @@
 # s4 = r'''Hello,
 # Lisa!'''
 # print(s3)
-a = 'ABC'.encode('ascii')
-print(a)
+# a = 'ABC'.encode('ascii')
+# print(a)
