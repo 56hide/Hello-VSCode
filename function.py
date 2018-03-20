@@ -58,7 +58,7 @@ import math
 # 函数执行完毕也没有return语句时，自动return None。
 # 函数可以同时返回多个值，但其实就是一个tuple。
 
-由于我们经常计算x2，所以，完全可以把第二个参数n的默认值设定为2：
+#由于我们经常计算x2，所以，完全可以把第二个参数n的默认值设定为2：
 
 # def power(x, n=2):
 #     s = 1
@@ -173,4 +173,220 @@ def move(n, a, b, c):
         move(1, a, b, c)
         move(n-1, b, a, c)
 
-move(4, 'A', 'B', 'C')
+#move(4, 'A', 'B', 'C')
+
+#切片
+L = ['Michael', 'Sarah', 'Tracy', 'Bob', 'Jack']
+#取出前三个元素
+print(L[0:3])
+#同样支持倒数索引，最后一个的索引是-1
+#用切片实现trim
+def trim(s): 
+    if s[:1]==' ': #注意，必须这么写，写成s[0]会在边界条件的时候出错，因为空字符串没有s[0]。但是却可以进行切片操作。 
+        return trim(s[1:]) 
+    if s[-1:] == ' ': 
+        return trim(s[:-1]) 
+    return s
+
+#如果给定一个list或tuple，我们可以通过for循环来遍历这个list或tuple，这种遍历我们称为迭代（Iteration）。
+
+# >>> d = {'a': 1, 'b': 2, 'c': 3}
+# >>> for key in d:
+# ...     print(key)
+# ...
+# a
+# c
+# b
+# 默认情况下，dict迭代的是key。如果要迭代value，可以用for value in d.values()，
+# 如果要同时迭代key和value，可以用for k, v in d.items()。
+#当我们使用for循环时，只要作用于一个可迭代对象，for循环就可以正常运行，而我们不太关心该对象究竟是list还是其他数据类型。
+# 那么，如何判断一个对象是可迭代对象呢？方法是通过collections模块的Iterable类型判断：
+
+# >>> from collections import Iterable
+# >>> isinstance('abc', Iterable) # str是否可迭代
+# True
+# >>> isinstance([1,2,3], Iterable) # list是否可迭代
+# True
+# >>> isinstance(123, Iterable) # 整数是否可迭代
+# False
+
+# Python内置的enumerate函数可以把一个list变成索引-元素对，这样就可以在for循环中同时迭代索引和元素本身：
+
+# >>> for i, value in enumerate(['A', 'B', 'C']):
+# ...     print(i, value)
+def findMinAndMax(L):
+    max = L[0]
+    min = L[0]
+    for i in L :
+        if max<i:
+            max=i
+        if min>i:
+            min=i
+    result=[max,min]
+    print(result)
+# L=[1,2,3,4,5,5,6]
+# findMinAndMax(L)
+
+# 列表生成式即List Comprehensions，是Python内置的非常简单却强大的可以用来创建list的生成式。
+# 举个例子，要生成list [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]可以用list(range(1, 11))
+# >>> [x * x for x in range(1, 11)]
+# [1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
+
+# for循环后面还可以加上if判断，这样我们就可以筛选出仅偶数的平方：
+
+# >>> [x * x for x in range(1, 11) if x % 2 == 0]
+# [4, 16, 36, 64, 100]
+
+# >>> [m + n for m in 'ABC' for n in 'XYZ']
+# ['AX', 'AY', 'AZ', 'BX', 'BY', 'BZ', 'CX', 'CY', 'CZ']
+
+
+# 生成器：generator。
+# 如果列表元素可以按照某种算法推算出来，那我们是否可以在循环的过程中不断推算出后续的元素呢？这样就不必创建完整的list，
+# 从而节省大量的空间。在Python中，这种一边循环一边计算的机制，称为生成器：generator。
+# 要创建一个generator，有很多种方法。第一种方法很简单，
+# 只要把一个列表生成式的[]改成()，就创建了一个generator：
+
+# >>> L = [x * x for x in range(10)]
+# >>> L
+# [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+# >>> g = (x * x for x in range(10))
+# >>> g
+# <generator object <genexpr> at 0x1022ef630>
+
+# 创建L和g的区别仅在于最外层的[]和()，L是一个list，而g是一个generator。
+#遍历生成器g
+# g = (x * x for x in range(10))
+# for n in g:
+#     print(n)
+
+#上面的函数和generator仅一步之遥。要把fib函数变成generator，只需要把print(b)改为yield b就可以了：
+
+def fib(max):
+    n, a, b = 0, 0, 1
+    while n < max:
+        yield b
+        a, b = b, a + b
+        n = n + 1
+    return 'done'
+# for n in fib(6):
+#     print(n)
+    #g = fib(6)
+#不能直接print（g）
+# >>> g = fib(6)
+# >>> g
+# <generator object fib at 0x1022ef948>
+# 这就是定义generator的另一种方法。如果一个函数定义中包含yield关键字，
+# 那么这个函数就不再是一个普通函数，而是一个generator：
+# >>> f = fib(6) #输出前六个斐波拉切数
+# 但是用for循环调用generator时，发现拿不到generator的return语句的返回值。
+# 如果想要拿到返回值，必须捕获StopIteration错误，返回值包含在StopIteration的value中：
+
+# >>> g = fib(6)
+# >>> while True:
+# ...     try:
+# ...         x = next(g)
+# ...         print('g:', x)
+# ...     except StopIteration as e:
+# ...         print('Generator return value:', e.value)
+# ...         break
+# generator函数的“调用”实际返回一个generator对象：
+
+# 我们已经知道，可以直接作用于for循环的数据类型有以下几种：
+# 一类是集合数据类型，如list、tuple、dict、set、str等；
+# 一类是generator，包括生成器和带yield的generator function。
+# 这些可以直接作用于for循环的对象统称为可迭代对象：Iterable。
+# 可以使用isinstance()判断一个对象是否是Iterable对象：
+# >>> from collections import Iterable
+# >>> isinstance([], Iterable)
+# True
+
+# 而生成器不但可以作用于for循环，还可以被next()函数不断调用并返回下一个值，
+# 直到最后抛出StopIteration错误表示无法继续返回下一个值了。
+# 可以被next()函数调用并不断返回下一个值的对象称为迭代器：Iterator。
+# 可以使用isinstance()判断一个对象是否是Iterator对象：
+
+# >>> from collections import Iterator
+# >>> isinstance((x for x in range(10)), Iterator)
+# True
+# >>> isinstance([], Iterator)
+# False
+
+# 生成器都是Iterator对象，但list、dict、str虽然是Iterable，却不是Iterator。
+
+# 把list、dict、str等Iterable变成Iterator可以使用iter()函数：
+
+# >>> isinstance(iter([]), Iterator)
+# True
+# >>> isinstance(iter('abc'), Iterator)
+# True
+
+# 你可能会问，为什么list、dict、str等数据类型不是Iterator？
+
+# 这是因为Python的Iterator对象表示的是一个数据流，Iterator对象可以被next()函数调用并不断返回下一个数据，
+# 直到没有数据时抛出StopIteration错误。可以把这个数据流看做是一个有序序列，但我们却不能提前知道序列的长度，
+# 只能不断通过next()函数实现按需计算下一个数据，所以Iterator的计算是惰性的，只有在需要返回下一个数据时它才会计算。
+# Iterator甚至可以表示一个无限大的数据流，例如全体自然数。而使用list是永远不可能存储全体自然数的。
+
+# # 小结
+# # 凡是可作用于for循环的对象都是Iterable类型；
+# # 凡是可作用于next()函数的对象都是Iterator类型，它们表示一个惰性计算的序列；
+# # 集合数据类型如list、dict、str等是Iterable但不是Iterator，不过可以通过iter()函数获得一个Iterator对象。
+# # Python的for循环本质上就是通过不断调用next()函数实现的，例如：
+# # for x in [1, 2, 3, 4, 5]:
+# #     pass
+
+# # 实际上完全等价于：
+
+# # # 首先获得Iterator对象:
+# # it = iter([1, 2, 3, 4, 5])
+# # # 循环:
+# # while True:
+# #     try:
+# #         # 获得下一个值:
+# #         x = next(it)
+# #     except StopIteration:
+# #         # 遇到StopIteration就退出循环
+# #         break
+
+
+
+#高阶函数：函数作为另一个函数的参数
+def add(x, y, f):
+    return f(x) + f(y)
+
+#print(add(-5, 6, abs))
+
+def f(x):
+    return x * x
+
+# r = map(f, [1, 2, 3, 4, 5, 6, 7, 8, 9])
+# print(list(r))
+# 再看reduce的用法。reduce把一个函数作用在一个序列[x1, x2, x3, ...]上，
+# 这个函数必须接收两个参数，reduce把结果继续和序列的下一个元素做累积计算，其效果就是：
+# reduce(f, [x1, x2, x3, x4]) = f(f(f(x1, x2), x3), x4)
+# 比方说对一个序列求和，就可以用reduce实现：
+# >>> from functools import reduce
+# >>> def add(x, y):
+# ...     return x + y
+# ...
+# >>> reduce(add, [1, 3, 5, 7, 9])
+# 25
+#filter函数
+# 例如，在一个list中，删掉偶数，只保留奇数，可以这么写：
+
+# def is_odd(n):
+#     return n % 2 == 1
+
+# list(filter(is_odd, [1, 2, 4, 5, 6, 9, 10, 15]))
+# 结果: [1, 5, 9, 15]
+
+# 把一个序列中的空字符串删掉，可以这么写：
+
+# def not_empty(s):
+#     return s and s.strip()
+
+# list(filter(not_empty, ['A', '', 'B', None, 'C', '  ']))
+# # 结果: ['A', 'B', 'C']
+
+    
